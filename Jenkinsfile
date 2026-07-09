@@ -26,6 +26,17 @@ pipeline {
       grypeScan scanDest: "docker:${registry}:${BUILD_NUMBER}", repName: 'scanResult.txt', autoInstall:true
     }
 }
-
+    post {
+        always {
+            recordIssues(
+                qualityGates: [
+                    [criticality: 'FAILURE', integerThreshold: 100, threshold: 100.0, type: 'TOTAL_HIGH'], 
+                    [criticality: 'FAILURE', integerThreshold: 5, threshold: 5.0, type: 'NEW']
+                    ], 
+                    sourceCodeRetention: 'LAST_BUILD', 
+                    tools: [grype()]
+            )
+        }
+    }
     }
 }
